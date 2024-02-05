@@ -7,6 +7,7 @@ import re
 
 INTERVAL = 20
 THREADS_NUM = 100
+DAYS = 1
 
 totals = []
 
@@ -20,11 +21,13 @@ def load_config(path: str):
 
 
 def filter_func(t: yf.Ticker, result, i):
-    hist_60k = t.history(interval="60m", period="5d")
+    hist_60k = t.history(interval="60m", period="1mo")
 
-    if len(hist_60k) < INTERVAL:
+    if len(hist_60k) < (INTERVAL + DAYS * 5):
         result[i] = False
         return
+
+    hist_60k = hist_60k[-(INTERVAL + DAYS * 5):]
 
     last_hist = hist_60k[-1:]['Close'].iloc[0]
     if last_hist < 10 or last_hist > 100:
